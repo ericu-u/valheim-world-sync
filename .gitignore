@@ -4,3 +4,9 @@
 
 # Personal cfg
 cfg.json
+
+# Ignore backups
+backups
+
+# Python cache
+__pycache__
