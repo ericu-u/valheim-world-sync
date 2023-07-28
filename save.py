@@ -1,23 +1,24 @@
 import argparse
 import os
 import json
+from util import COLORS, GitManager
 from shutil import copy
 
 def main():
     parser = argparse.ArgumentParser()
 
     # Flags
-    parser.add_argument("-p", "--push", help="Gets remote world data and saves locally", action="store_true")
+    parser.add_argument("-p", "--sync", help="Gets remote world data and saves locally", action="store_true")
     parser.add_argument("-r", "--reset", help="Resets local cfg and reruns the setup proccess", action="store_true")
     args = parser.parse_args()
-    push = args.push
+    sync = args.sync
     reset = args.reset
 
     # Open local user data
     try:
         user_data = json.load(open("cfg.json", "r"))
     except Exception as e:
-        print(f"`cfg.json` not detected, moving to setup")
+        print(f"{COLORS.warning}`cfg.json` not detected, moving to setup{COLORS.endc}")
         user_data = json.load(open("sample.cfg.json", "r"))
         json.dump(user_data, open("cfg.json", "w"))
         reset = True
@@ -37,15 +38,17 @@ def main():
     save_db = save_location + ".db"
     save_fwl = save_location + ".fwl"
 
-    # Save or push data
-    if push:
+    # Save to or sync remote data
+    if sync:
+        GitManager.pull()
         copy(save_db, world_db)
         copy(save_fwl, world_fwl)
-        print(f"Data synced from remote, working clean")
+        print(f"{COLORS.ok}World data synced to local from GitHub{COLORS.endc}")
     else:
         copy(world_db, save_db)
         copy(world_fwl, save_fwl)
-        print(f"Data saved to `{save_db}` and `{save_fwl}`")
+        GitManager.push()
+        print(f"{COLORS.ok}Local World data saved to GitHub{COLORS.endc}")
         
 
 def setup_cfg(user_data):
