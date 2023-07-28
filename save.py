@@ -7,8 +7,10 @@ def main():
     parser = argparse.ArgumentParser()
 
     # Flags
-    parser.add_argument("-r", "--reset", help="Resets local cfg", action="store_true")
+    parser.add_argument("-p", "--push", help="Gets remote world data and saves locally", action="store_true")
+    parser.add_argument("-r", "--reset", help="Resets local cfg and reruns the setup proccess", action="store_true")
     args = parser.parse_args()
+    push = args.push
     reset = args.reset
 
     # Open local user data
@@ -24,12 +26,27 @@ def main():
     if (not user_data['localUser'] or not user_data['defaultWorld']) or reset:
         setup_cfg(user_data)
 
-    print(user_data)
-
-    # Key vars
+    # Get save paths
     user_path = r"C:\Users"
-    valheim_saves = r"\AppData\LocalLow\IronGate\Valheim\worlds_local"
-    print(os.path.join(user_path, user_data['localUser'], valheim_saves, user_data['defaultWorld']))
+    valheim_saves = r"AppData\LocalLow\IronGate\Valheim\worlds_local"
+    world_location = os.path.join(user_path, user_data['localUser'], valheim_saves, user_data['defaultWorld'])
+    save_location = os.path.join("./world_data", user_data['defaultWorld'])
+    
+    world_db = world_location + ".db"
+    world_fwl = world_location + ".fwl"
+    save_db = save_location + ".db"
+    save_fwl = save_location + ".fwl"
+
+    # Save or push data
+    if push:
+        copy(save_db, world_db)
+        copy(save_fwl, world_fwl)
+        print(f"Data synced from remote, working clean")
+    else:
+        copy(world_db, save_db)
+        copy(world_fwl, save_fwl)
+        print(f"Data saved to `{save_db}` and `{save_fwl}`")
+        
 
 def setup_cfg(user_data):
     """ Sets up the users cfg to memorize user defaults """
