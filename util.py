@@ -2,7 +2,8 @@ from subprocess import run
 from datetime import datetime
 
 class COLORS:
-    ok = "\033[92m"
+    okgreen = "\033[92m"
+    okcyan = '\033[96m'
     warning = "\033[93m"
     fail = "\033[91m"
     endc = "\033[0m"
